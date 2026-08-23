@@ -15,16 +15,19 @@ cd ../corteza
 docker compose up -d
 ```
 
-Wait until http://localhost:18080/version returns `"version":"2024.9.9"`. The `bootstrap` container creates the demo user, namespace, modules, and seed tickets on first boot (it is safe to run again).
+Wait until http://localhost:18080/version returns `"version":"2024.9.9"`.
 
-Then open http://localhost:18080/tickets and sign in:
+**What a clone gets automatically**
 
-- email: `homework@plexys.local`
-- password: `Homework!2026`
+On first `docker compose up`, the `bootstrap` container:
 
-You should see the same Support Ticket list as in the documentation (about 20 tickets, 3 customers).
+1. Creates the demo login **homework@plexys.local** / **Homework!2026** (or signs in if it already exists)
+2. Creates the Compose namespace and modules
+3. Loads about **20 tickets** and **3 customers** from `compose/seed.json`
 
-If you already started Corteza once **without** this seed, reset the volumes and start again:
+Then open http://localhost:18080/tickets and sign in with that email and password. You should see the same Support Ticket list as in the PDF screenshots.
+
+If you already started Corteza once **without** this seed (empty login / no tickets), Docker is still using the old empty volume. Reset it and start again:
 
 ```bash
 cd corteza

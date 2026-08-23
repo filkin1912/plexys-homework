@@ -14,9 +14,10 @@ Local instance
 - Compose: http://localhost:18080/compose
 - From a clean clone: `cd spa && npm install && npm run build`, then
   `cd ../corteza && docker compose up -d`
-- Bootstrap creates the demo user and seed tickets automatically
-- First-run signup at /auth/signup (first user is admin)
-- Demo account used while building: homework@plexys.local / Homework!2026
+- First `docker compose up` creates the demo user and about 20 seed tickets
+- Demo login: homework@plexys.local / Homework!2026
+- If an older empty Docker volume is already on the machine:
+  `cd corteza && docker compose down -v && docker compose up -d`
 
 What I shipped
 - Namespace Plexys Homework with Support Ticket + related Customer

@@ -88,12 +88,12 @@
     <tr><td>Customer</td><td>Email</td><td>Email</td><td>No</td></tr>
   </table>
   <p>Click path in Compose: Low Code → Create namespace → Module “Customer” → Module “Support Ticket” → field Customer, type Record, related module Customer, label field Name → save → add a record of each to prove the module writes.</p>
-  <p><code>compose/*.json</code> plus <code>scripts/provision.mjs</code> replay the same model through the Compose API if a reviewer prefers not to click. The UI path is the one the brief asked for.</p>
+  <p><code>compose/*.json</code> and <code>compose/seed.json</code> plus <code>scripts/bootstrap.mjs</code> replay the same model and about 20 demo tickets on <code>docker compose up</code>. The UI click path is still the one the brief asked for.</p>
 
   <h2>4. User guide</h2>
   <ol>
     <li>Open <code>http://localhost:18080/tickets</code>. Corteza’s login appears if you have no session.</li>
-    <li>Sign in as the same user you created at first-run. The desk shows <strong>Loged-in user:</strong> and that account’s email top-right. New tickets are owned by that user.</li>
+    <li>Sign in with the demo account <code>homework@plexys.local</code> / <code>Homework!2026</code>. After a clean clone, bootstrap creates this user and the seed tickets automatically. The desk shows <strong>Loged-in user:</strong> and that email top-right.</li>
     <li><strong>Tickets</strong> lists subject, status, priority (colour-coded), related customer, due date, and Corteza’s <code>updatedAt</code>. Seven rows per page; the table height stays fixed so the pager does not jump.</li>
     <li>Filter by subject or customer name, and/or by priority. Both filters apply together, then pagination covers the match set.</li>
     <li><strong>New ticket</strong> opens a modal. Subject, status and priority are required. Pick a customer if one exists.</li>
@@ -110,10 +110,20 @@ npm run build
 cd ../corteza
 docker compose up -d
 # wait until http://localhost:18080/version returns 2024.9.9</pre>
-  <p>The <code>bootstrap</code> container waits for the API, then creates <code>homework@plexys.local</code> / <code>Homework!2026</code>, the Compose namespace/modules, and the seed tickets from <code>compose/seed.json</code>. It is idempotent. If an older empty volume is already on the machine, run <code>docker compose down -v</code> then <code>up -d</code> again.</p>
+  <p>On first <code>docker compose up</code>, the <code>bootstrap</code> container waits for the API, then:</p>
+  <ol>
+    <li>Creates the demo login <code>homework@plexys.local</code> / <code>Homework!2026</code> (or signs in if it already exists).</li>
+    <li>Creates the Compose namespace and modules.</li>
+    <li>Loads about 20 tickets and 3 customers from <code>compose/seed.json</code>.</li>
+  </ol>
+  <p>The tickets are not a copied Postgres dump. They are written through the Compose API. Bootstrap is safe to run again. If someone already started Corteza once and got an empty login, Docker is still using that empty volume — reset it:</p>
+  <pre>cd corteza
+docker compose down -v
+docker compose up -d</pre>
   <div class="box">
-    <strong>Local demo account used while building:</strong><br />
+    <strong>Demo login after a clean clone:</strong><br />
     email <code>homework@plexys.local</code> · password <code>Homework!2026</code><br />
+    Desk shows about 20 tickets and 3 customers<br />
     URLs: <code>http://localhost:18080/tickets</code> · Compose <code>/compose</code> · Admin <code>/admin</code><br />
     GitHub: <code>https://github.com/filkin1912/plexys-homework</code>
   </div>
@@ -126,8 +136,8 @@ npm run build
   <h3>Auth client</h3>
   <p>None was added. The SPA uses Corteza’s default OAuth2 client, same as Compose. Redirect URI is <code>http://localhost:18080/tickets/auth/callback</code>. Scopes: <code>profile api</code>.</p>
   <h3>Optional API replay</h3>
-  <pre>set CORTEZA_JWT=eyJ...   # copy from an authenticated request
-node scripts/provision.mjs</pre>
+  <p>Reviewers do not need a JWT. <code>docker compose up</code> already runs <code>scripts/bootstrap.mjs</code>. To run the same seed by hand after the server is up:</p>
+  <pre>node scripts/bootstrap.mjs</pre>
 
   <h2>6. Limitations and next</h2>
   <ul>
