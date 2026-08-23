@@ -7,74 +7,49 @@
     @page { size: A4; margin: 18mm 16mm; }
     body { font-family: "Segoe UI", Helvetica, Arial, sans-serif; color: #1c211c; font-size: 11pt; line-height: 1.45; }
     h1 { font-size: 20pt; margin: 0 0 6px; }
-    h2 { font-size: 14pt; margin: 22px 0 8px; border-bottom: 1px solid #d7d1c6; padding-bottom: 4px; }
-    h3 { font-size: 12pt; margin: 16px 0 6px; }
+    h2 { font-size: 14pt; margin: 20px 0 8px; border-bottom: 1px solid #d7d1c6; padding-bottom: 4px; }
+    h3 { font-size: 12pt; margin: 14px 0 6px; }
     p, li { margin: 0 0 8px; }
     .kicker { letter-spacing: .14em; text-transform: uppercase; font-size: 9pt; color: #2f5c4f; }
-    .meta { color: #5f675e; font-size: 10pt; margin-bottom: 18px; }
-    table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; font-size: 10pt; }
+    .meta { color: #5f675e; font-size: 10pt; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; margin: 8px 0 12px; font-size: 10pt; }
     th, td { border: 1px solid #d7d1c6; padding: 5px 7px; text-align: left; vertical-align: top; }
     th { background: #f3eee4; }
     code { font-family: Consolas, monospace; font-size: 9.5pt; }
     pre { background: #f6f1e8; border: 1px solid #d7d1c6; padding: 8px 10px; font-size: 9pt; overflow: hidden; }
-    img { max-width: 100%; border: 1px solid #d7d1c6; margin: 8px 0 14px; }
-    .caption { font-size: 9pt; color: #5f675e; margin-top: -10px; margin-bottom: 14px; }
-    .box { border: 1px solid #d7d1c6; padding: 8px 10px; margin: 10px 0; }
+    img { display: block; width: 100%; height: auto; border: 1px solid #d7d1c6; margin: 6px 0 4px; }
+    img.login { width: auto; max-width: 100%; max-height: 260px; }
+    .caption { font-size: 9pt; color: #5f675e; margin-bottom: 12px; }
   </style>
 </head>
 <body>
   <p class="kicker">Plexys · Front-end / Full-stack homework</p>
   <h1>Support desk on Corteza</h1>
-  <p class="meta">Vasil Filkin · Corteza 2024.9.9 · Vue 3 Composition API · local Docker<br />
+  <p class="meta">Vasil Filkin · Corteza 2024.9.9 · Vue 3 Composition API<br />
     Repo: <code>https://github.com/filkin1912/plexys-homework</code></p>
 
   <h2>1. Architecture</h2>
-  <p>One Corteza server process serves the API, the OAuth2 authorization server, the first-party webapps (Admin, Compose), and this homework SPA. PostgreSQL 15 holds Compose records and system data. The SPA is not a second origin.</p>
-  <img src="login.png" alt="Corteza login at localhost:18080/auth/login" />
-  <p class="caption">Figure 1. First-run / daily login on the local instance (Corteza 2024.9.9). The SPA at /tickets uses this same session via the default OAuth2 client.</p>
+  <p>One Corteza 2024.9.9 process serves Auth, the Compose API, Admin, Compose, and this SPA. PostgreSQL 15 stores system data and records. The desk is a first-party webapp (uses same host: localhost:18080) at <code>/tickets</code>, same origin as <code>/auth</code> and <code>/api</code>.</p>
   <pre>Browser
-  ├── /auth                  Corteza OAuth2 (login, default-client, tokens)
-  ├── /api/compose           Low Code records (Bearer access token)
-  ├── /admin                 Corteza Admin
-  ├── /compose               Corteza Low Code builder (Part 1)
-  └── /tickets               Vue 3 SPA (Part 2), listed in HTTP_WEBAPP_LIST
+  ├── /auth           Corteza OAuth2 (login, default-client, tokens)
+  ├── /api/compose    records (Bearer token of the signed-in user)
+  ├── /admin          Corteza Admin
+  ├── /compose        Low Code builder (Part 1)
+  └── /tickets        Vue 3 SPA (Part 2)
          │
          └── Postgres 15</pre>
-  <p>Requests from the desk carry the signed-in user’s access token. Corteza stamps <code>ownedBy</code>, <code>createdBy</code>, <code>createdAt</code> and <code>updatedAt</code>. The SPA never writes those fields.</p>
+  <p>The SPA sends the user’s access token. Corteza stamps <code>ownedBy</code>, <code>createdBy</code>, <code>createdAt</code> and <code>updatedAt</code>. Those fields are never written from the client.</p>
+  <img class="login" src="login.png" alt="Corteza login" />
+  <p class="caption">Figure 1. Local login. The desk reuses this session through the default OAuth2 client.</p>
 
   <h2>2. Decisions</h2>
-  <h3>Corteza 2024.9.9</h3>
-  <p>The published docs currently live under the 2024.9 series. <code>2024.9.9</code> is the latest stable tag on Docker Hub for that series. I pinned the patch (not <code>2024.9</code> floating, not <code>2024.9.10-dev.*</code>) so a clone tomorrow still boots the same bits.</p>
+  <p><strong>Version.</strong> I ran Corteza <code>2024.9.9</code> — the latest stable Docker image that matches the current docs. The exact patch is pinned so a clone always starts the same version.</p>
+  <p><strong>Serving.</strong> Corteza can serve a custom app next to Admin and Compose. I put the built desk in <code>/corteza/webapp/tickets</code> so it uses the same host and the same login as Compose. A separate Vite site on another port would need its own Auth Client and CORS. I did not build the desk as Compose pages — the brief asks for a custom SPA.</p>
+  <p><strong>Vue 3 vs corteza-vue.</strong> The brief asks for Vue 3. The official <code>corteza-vue</code> package still uses Vue 2, so I did not use it. Ticket records go through <code>corteza-js</code>. Login is a small Vue 3 copy of Corteza’s default-client flow (token in memory, refresh in <code>sessionStorage</code>).</p>
+  <p><strong>UI.</strong> PrimeVue for the create/edit and delete dialogs. Tickets are a table so columns are easy to compare. Every action is a visible button.</p>
 
-  <h3>How the SPA is served</h3>
-  <p>Corteza can host custom webapps next to Compose: <code>HTTP_WEBAPP_ENABLED=true</code> and <code>HTTP_WEBAPP_LIST=…,tickets</code>, with the built files mounted at <code>/corteza/webapp/tickets</code> (in the 2024.9.9 image the apps live under <code>webapp/</code>, not <code>webapp/public/</code>). That is the path I used.</p>
-  <p>I did not run the SPA as a standalone Vite origin. A second origin would need a dedicated Auth Client, CORS, and a different redirect URI. First-party apps avoid that by sitting on the same host and using <code>/auth/oauth2/default-client</code>. Serving <code>/tickets</code> from Corteza keeps identity, cookies and audit trail on the platform’s terms.</p>
-  <p>I also did not build the desk as Compose pages. Compose already lists records; the brief asks for a custom SPA against the module, so Compose stays the modeller and the SPA stays the operator UI.</p>
-
-  <h3>Vue 3 instead of corteza-vue</h3>
-  <p>The brief asks for Vue 3 and the Composition API. <code>@cortezaproject/corteza-vue@2024.9.9</code> depends on Vue 2.7 and bootstrap-vue. Dropping it into Vue 3 would mean rewriting its plugin surface anyway. I used <code>@cortezaproject/corteza-js</code> <code>apiClients.Compose</code> for record calls, and a small Composition API wrapper around the same default-client flow implemented in <code>corteza-vue</code>’s auth plugin (access token in memory, refresh token in <code>sessionStorage</code>, callback at <code>/tickets/auth/callback</code>).</p>
-
-  <h3>UI toolkit</h3>
-  <p>PrimeVue supplies the modal and confirm dialog (focus trap, Escape, labelled headers). The list is a semantic HTML table, not a card grid: ticket work is comparison across columns. Keyboard: native controls, dialogs, visible buttons — no hover-only actions.</p>
-
-  <h3>Desk UI after the last polish</h3>
-  <p>Tickets and Customers share one four-column toolbar (count · optional filters · create button) so switching tabs does not move the table or the create button. The header is one line: <strong>Support desk</strong> plus <strong>Plexys homework</strong>, nav in the middle, and <strong>Loged-in user:</strong> with the account email on the right.</p>
-  <p>Tickets add a search that matches <em>subject or customer name</em>, a priority dropdown (All / Low / Medium / High / Urgent), and a 7-row pager. Empty rows keep the table height so Previous / 1 2 3 / Next stay put on the last page. Status and priority use the same pill size. Priority colours:</p>
-  <table>
-    <tr><th>Priority</th><th>Colour</th></tr>
-    <tr><td>Low</td><td>Green</td></tr>
-    <tr><td>Medium</td><td>Blue</td></tr>
-    <tr><td>High</td><td>Orange</td></tr>
-    <tr><td>Urgent</td><td>Red</td></tr>
-  </table>
-  <p>These filters and the pager are extra UX. The brief asked for list / create / edit / delete of Support Ticket records as the signed-in user; that path is unchanged.</p>
-  <img src="screenshots/02-tickets.png" alt="Support desk tickets list at /tickets" />
-  <p class="caption">Figure 2. Tickets: subject/customer search, priority filter, colour-coded pills, 7 rows per page, signed-in email top-right.</p>
-  <img src="screenshots/03-customers.png" alt="Support desk customers list at /tickets/customers" />
-  <p class="caption">Figure 3. Customers: same header and create-button slot; related-module CRUD for the ticket picker.</p>
-
-  <h2>3. Data model (Part 1)</h2>
-  <p>Namespace <strong>Plexys Homework</strong> (<code>plexys_homework</code>). System fields were not re-created.</p>
+  <h2>3. Data model</h2>
+  <p>Namespace <strong>Plexys Homework</strong> (<code>plexys_homework</code>). System owner and timestamp fields were not re-created. Customer is the bonus related module.</p>
   <table>
     <tr><th>Module</th><th>Field</th><th>Type</th><th>Required</th></tr>
     <tr><td>Support Ticket</td><td>Subject</td><td>String</td><td>Yes</td></tr>
@@ -82,72 +57,39 @@
     <tr><td>Support Ticket</td><td>Status</td><td>Select: New, In Progress, Resolved, Closed</td><td>Yes</td></tr>
     <tr><td>Support Ticket</td><td>Priority</td><td>Select: Low, Medium, High, Urgent</td><td>Yes</td></tr>
     <tr><td>Support Ticket</td><td>Due Date</td><td>DateTime</td><td>No</td></tr>
-    <tr><td>Support Ticket</td><td>Customer</td><td>Record → Customer</td><td>No (bonus)</td></tr>
+    <tr><td>Support Ticket</td><td>Customer</td><td>Record → Customer</td><td>No</td></tr>
     <tr><td>Customer</td><td>Name</td><td>String</td><td>Yes</td></tr>
     <tr><td>Customer</td><td>Company</td><td>String</td><td>No</td></tr>
     <tr><td>Customer</td><td>Email</td><td>Email</td><td>No</td></tr>
   </table>
-  <p>Click path in Compose: Low Code → Create namespace → Module “Customer” → Module “Support Ticket” → field Customer, type Record, related module Customer, label field Name → save → add a record of each to prove the module writes.</p>
-  <p><code>compose/*.json</code> and <code>compose/seed.json</code> plus <code>scripts/bootstrap.mjs</code> replay the same model and about 20 demo tickets on <code>docker compose up</code>. The UI click path is still the one the brief asked for.</p>
+  <img src="screenshots/02-tickets.png" alt="Tickets list" />
+  <p class="caption">Figure 2. Tickets: list, search, priority filter, create / edit / delete.</p>
+  <img src="screenshots/03-customers.png" alt="Customers list" />
+  <p class="caption">Figure 3. Customers: related-module CRUD used by the ticket picker.</p>
 
   <h2>4. User guide</h2>
   <ol>
-    <li>Open <code>http://localhost:18080/tickets</code>. Corteza’s login appears if you have no session.</li>
-    <li>Sign in with the demo account <code>homework@plexys.local</code> / <code>Homework!2026</code>. After a clean clone, bootstrap creates this user and the seed tickets automatically. The desk shows <strong>Loged-in user:</strong> and that email top-right.</li>
-    <li><strong>Tickets</strong> lists subject, status, priority (colour-coded), related customer, due date, and Corteza’s <code>updatedAt</code>. Seven rows per page; the table height stays fixed so the pager does not jump.</li>
-    <li>Filter by subject or customer name, and/or by priority. Both filters apply together, then pagination covers the match set.</li>
-    <li><strong>New ticket</strong> opens a modal. Subject, status and priority are required. Pick a customer if one exists.</li>
-    <li><strong>Edit</strong> reopens the modal on that record. <strong>Delete</strong> asks for confirmation.</li>
-    <li><strong>Customers</strong> is the related module CRUD. The create button sits in the same top-right slot as New ticket. Create a customer before linking it on a ticket.</li>
-    <li>Sign out returns you to Corteza Auth and drops the refresh token.</li>
+    <li>Open <code>http://localhost:18080/tickets</code> and sign in as <code>homework@plexys.local</code> / <code>Homework!2026</code>.</li>
+    <li>The header shows the signed-in email. New tickets are owned by that user.</li>
+    <li><strong>New ticket</strong> / <strong>Edit</strong> open a modal. Subject, status and priority are required. Pick a customer if one exists.</li>
+    <li><strong>Delete</strong> asks for confirmation.</li>
+    <li><strong>Customers</strong> manages the related records. Create a customer before linking it on a ticket.</li>
+    <li>Sign out returns to Corteza Auth.</li>
   </ol>
 
   <h2>5. Admin guide</h2>
-  <h3>Instance</h3>
-  <pre>cd spa
-npm install
-npm run build
-cd ../corteza
-docker compose up -d
-# wait until http://localhost:18080/version returns 2024.9.9</pre>
-  <p>On first <code>docker compose up</code>, the <code>bootstrap</code> container waits for the API, then:</p>
-  <ol>
-    <li>Creates the demo login <code>homework@plexys.local</code> / <code>Homework!2026</code> (or signs in if it already exists).</li>
-    <li>Creates the Compose namespace and modules.</li>
-    <li>Loads about 20 tickets and 3 customers from <code>compose/seed.json</code>.</li>
-  </ol>
-  <p>The tickets are not a copied Postgres dump. They are written through the Compose API. Bootstrap is safe to run again. If someone already started Corteza once and got an empty login, Docker is still using that empty volume — reset it:</p>
-  <pre>cd corteza
-docker compose down -v
-docker compose up -d</pre>
-  <div class="box">
-    <strong>Demo login after a clean clone:</strong><br />
-    email <code>homework@plexys.local</code> · password <code>Homework!2026</code><br />
-    Desk shows about 20 tickets and 3 customers<br />
-    URLs: <code>http://localhost:18080/tickets</code> · Compose <code>/compose</code> · Admin <code>/admin</code><br />
-    GitHub: <code>https://github.com/filkin1912/plexys-homework</code>
-  </div>
-  <h3>SPA build</h3>
-  <pre>cd spa
-npm install
-npm run build
-# docker compose already mounts spa/dist at /corteza/webapp/tickets
-# refresh http://localhost:18080/tickets</pre>
-  <h3>Auth client</h3>
-  <p>None was added. The SPA uses Corteza’s default OAuth2 client, same as Compose. Redirect URI is <code>http://localhost:18080/tickets/auth/callback</code>. Scopes: <code>profile api</code>.</p>
-  <h3>Optional API replay</h3>
-  <p>Reviewers do not need a JWT. <code>docker compose up</code> already runs <code>scripts/bootstrap.mjs</code>. To run the same seed by hand after the server is up:</p>
-  <pre>node scripts/bootstrap.mjs</pre>
+  <p>How to start the stack is in the README. After <code>docker compose up</code>, wait until <code>http://localhost:18080/version</code> shows <code>2024.9.9</code>.</p>
+  <p>The first start creates the demo user, the modules, and about 20 tickets. If login fails or the list is empty, run <code>docker compose down -v</code> in <code>corteza/</code> and start again.</p>
+  <p><strong>Auth.</strong> No extra Auth Client. The desk uses Corteza’s built-in login, same as Compose.</p>
+  <p><strong>Config.</strong> Settings are in <code>corteza/.env.example</code>. After a UI change, run <code>npm run build</code> in <code>spa/</code> and refresh <code>/tickets</code>. Modules can also be checked in Compose at <code>/compose</code>.</p>
 
   <h2>6. Limitations and next</h2>
   <ul>
-    <li>The API load caps at 200 records; the desk paginates 7 per page in the browser. Next would be Corteza page cursors.</li>
-    <li>No custom RBAC beyond “signed-in user”; next would be a Support Agent role on the namespace.</li>
-    <li>Deleting a customer does not cascade; tickets keep the old record ID until edited.</li>
-    <li>The JS bundle is large (corteza-js + PrimeVue). Next: lazy-load PrimeVue and the customers route.</li>
-    <li>No automated browser tests. Next: Playwright against the default-client callback.</li>
-    <li>If the 4–5 h budget had more room: a Service module, a status filter, and a Compose record page that deep-links into the desk.</li>
+    <li>The list loads at most 200 tickets. Next: proper server-side paging.</li>
+    <li>Anyone who can sign in can use the desk. Next: a Support Agent role.</li>
+    <li>Deleting a customer does not update old tickets that still point to it.</li>
+    <li>No automated browser tests yet.</li>
   </ul>
-  <p>Observed, not assumed: first-run signup without SMTP marks the user confirmed; <code>/version</code> reports <code>2024.9.9</code>; the default-client exchange is POST <code>/auth/oauth2/default-client</code> with <code>application/x-www-form-urlencoded</code>; Compose record create accepts <code>values: [{name, value}]</code> and fills owner/timestamps itself. Assumed: SPA fallback for <code>/tickets/auth/callback</code> (same as other Corteza webapps); Select option JSON shape <code>{value, text}</code> matches what Compose stores.</p>
+  <p>Observed: signup works without email; <code>/version</code> is <code>2024.9.9</code>; Corteza fills owner and timestamps on create. Assumed: <code>/tickets/auth/callback</code> is served by the SPA, like other Corteza apps.</p>
 </body>
 </html>

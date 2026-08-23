@@ -24,4 +24,4 @@ docker compose down -v
 docker compose up -d
 ```
 
-Write-up: [docs/Plexys-homework-documentation.pdf](docs/Plexys-homework-documentation.pdf).
+Documentation: [docs/Plexys-homework-documentation.pdf](docs/Plexys-homework-documentation.pdf).
