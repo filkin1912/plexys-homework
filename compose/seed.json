@@ -1,0 +1,189 @@
+{
+  "customers": [
+    {
+      "Name": "Nordic Freight",
+      "Company": "Nordic Freight AB",
+      "Email": "ops@nordic-freight.example"
+    },
+    {
+      "Name": "Baltic Ports",
+      "Company": "Baltic Ports Oy",
+      "Email": "yard@baltic-ports.example"
+    },
+    {
+      "Name": "Oslo Coldstore",
+      "Company": "Oslo Coldstore AS",
+      "Email": "night@oslo-coldstore.example"
+    }
+  ],
+  "tickets": [
+    {
+      "Subject": "Dock scanner offline in Gothenburg",
+      "Description": "Seed record created so the module can be verified.",
+      "Status": "New",
+      "Priority": "High",
+      "DueDate": "",
+      "Customer": "Nordic Freight"
+    },
+    {
+      "Subject": "Invoice portal returns 500 on export",
+      "Description": "Finance cannot export August invoices. Error appears after choosing CSV.",
+      "Status": "In Progress",
+      "Priority": "Medium",
+      "DueDate": "2026-08-26T09:00:00Z",
+      "Customer": "Nordic Freight"
+    },
+    {
+      "Subject": "RFID gate stuck open at terminal 3",
+      "Description": "Barrier stays raised after each truck. Security asked for a same-day fix.",
+      "Status": "New",
+      "Priority": "Urgent",
+      "DueDate": "2026-08-23T18:00:00Z",
+      "Customer": "Baltic Ports"
+    },
+    {
+      "Subject": "Weekly report missing Saturday rows",
+      "Description": "Saturday shifts are dropped from the weekly ops report.",
+      "Status": "Resolved",
+      "Priority": "Low",
+      "DueDate": "",
+      "Customer": "Nordic Freight"
+    },
+    {
+      "Subject": "Extra login for night shift",
+      "Description": "Please add a second dispatcher account for the 22:00-06:00 desk.",
+      "Status": "Closed",
+      "Priority": "Low",
+      "DueDate": "",
+      "Customer": "Nordic Freight"
+    },
+    {
+      "Subject": "Cooling unit alarm on bay 12",
+      "Description": "Temperature spiked to 8C twice last night. Alarm did not page on-call.",
+      "Status": "New",
+      "Priority": "Urgent",
+      "DueDate": "2026-08-23T17:00:00Z",
+      "Customer": "Oslo Coldstore"
+    },
+    {
+      "Subject": "Yard camera 4 shows black screen",
+      "Description": "Night feed dropped at 02:10.",
+      "Status": "New",
+      "Priority": "High",
+      "DueDate": "2026-08-25T07:00:00Z",
+      "Customer": "Baltic Ports"
+    },
+    {
+      "Subject": "Pallet labels print too small",
+      "Description": "Barcode scanners fail on the new 40mm labels.",
+      "Status": "In Progress",
+      "Priority": "Medium",
+      "DueDate": "2026-08-27T12:00:00Z",
+      "Customer": "Nordic Freight"
+    },
+    {
+      "Subject": "VPN drops during shift handover",
+      "Description": "Dispatchers lose the yard map for about two minutes.",
+      "Status": "New",
+      "Priority": "Urgent",
+      "DueDate": "2026-08-24T05:00:00Z",
+      "Customer": "Oslo Coldstore"
+    },
+    {
+      "Subject": "Wrong timezone on gate bookings",
+      "Description": "Slots show UTC instead of local time.",
+      "Status": "Resolved",
+      "Priority": "Medium",
+      "DueDate": "",
+      "Customer": "Baltic Ports"
+    },
+    {
+      "Subject": "Spare-parts order form times out",
+      "Description": "Submit hangs after attaching a photo.",
+      "Status": "In Progress",
+      "Priority": "High",
+      "DueDate": "2026-08-28T15:00:00Z",
+      "Customer": "Nordic Freight"
+    },
+    {
+      "Subject": "Forklift tablet will not charge",
+      "Description": "Bay 7 unit stays at 3 percent.",
+      "Status": "New",
+      "Priority": "Low",
+      "DueDate": "2026-09-02T08:00:00Z",
+      "Customer": "Oslo Coldstore"
+    },
+    {
+      "Subject": "Manifest PDF missing page 2",
+      "Description": "Export from last Friday is one page short.",
+      "Status": "Closed",
+      "Priority": "Low",
+      "DueDate": "",
+      "Customer": "Nordic Freight"
+    },
+    {
+      "Subject": "Seal number rejected at customs",
+      "Description": "Checksum on the new seal series is wrong.",
+      "Status": "New",
+      "Priority": "Urgent",
+      "DueDate": "2026-08-23T18:00:00Z",
+      "Customer": "Baltic Ports"
+    },
+    {
+      "Subject": "Temperature log export is empty",
+      "Description": "CSV downloads with headers only.",
+      "Status": "In Progress",
+      "Priority": "High",
+      "DueDate": "2026-08-26T11:00:00Z",
+      "Customer": "Oslo Coldstore"
+    },
+    {
+      "Subject": "Reset password for weekend clerk",
+      "Description": "Account locked after three tries.",
+      "Status": "Resolved",
+      "Priority": "Low",
+      "DueDate": "",
+      "Customer": "Nordic Freight"
+    },
+    {
+      "Subject": "Weighbridge stuck on last truck",
+      "Description": "Display still shows 41.2 t after the truck left.",
+      "Status": "New",
+      "Priority": "High",
+      "DueDate": "2026-08-24T18:00:00Z",
+      "Customer": "Baltic Ports"
+    },
+    {
+      "Subject": "Add Swedish UI for drivers",
+      "Description": "Night crew asked for a language toggle.",
+      "Status": "In Progress",
+      "Priority": "Medium",
+      "DueDate": "2026-09-10T09:00:00Z",
+      "Customer": "Oslo Coldstore"
+    },
+    {
+      "Subject": "Duplicate booking for slot 14:30",
+      "Description": "Two trailers were given the same gate time.",
+      "Status": "New",
+      "Priority": "Urgent",
+      "DueDate": "2026-08-23T13:00:00Z",
+      "Customer": "Nordic Freight"
+    },
+    {
+      "Subject": "say Hello",
+      "Description": "Demo ticket from the review desk.",
+      "Status": "In Progress",
+      "Priority": "Medium",
+      "DueDate": "2026-09-01T09:21:00Z",
+      "Customer": "Oslo Coldstore"
+    },
+    {
+      "Subject": "say Hello to Vasil",
+      "Description": "Demo ticket from the review desk.",
+      "Status": "New",
+      "Priority": "Medium",
+      "DueDate": "",
+      "Customer": ""
+    }
+  ]
+}

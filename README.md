@@ -7,30 +7,33 @@ Repository: https://github.com/filkin1912/plexys-homework
 ## Quick start
 
 ```bash
-cd corteza
+cd spa
+npm install
+npm run build
+
+cd ../corteza
 docker compose up -d
 ```
 
-Wait until http://localhost:18080/version returns `"version":"2024.9.9"`.
+Wait until http://localhost:18080/version returns `"version":"2024.9.9"`. The `bootstrap` container creates the demo user, namespace, modules, and seed tickets on first boot (it is safe to run again).
 
-First boot only: open http://localhost:18080/auth/signup and create the admin user (no SMTP; the first account is confirmed automatically).
-
-A local account already exists on this machine from development:
+Then open http://localhost:18080/tickets and sign in:
 
 - email: `homework@plexys.local`
 - password: `Homework!2026`
 
-Build and (re)mount the desk:
+You should see the same Support Ticket list as in the documentation (about 20 tickets, 3 customers).
+
+If you already started Corteza once **without** this seed, reset the volumes and start again:
 
 ```bash
-cd spa
-npm install
-npm run build
+cd corteza
+docker compose down -v
+docker compose up -d
 ```
 
-`corteza/docker-compose.yaml` mounts `spa/dist` at `/corteza/webapp/tickets`. Open:
+Other URLs:
 
-- Desk: http://localhost:18080/tickets
 - Compose (module builder): http://localhost:18080/compose
 - Admin: http://localhost:18080/admin
 
@@ -43,7 +46,7 @@ In Low Code (Compose), create namespace **Plexys Homework** (handle `plexys_home
 3. Do not add created / updated / owner fields.
 4. Create one Customer and one Support Ticket in Compose so the modules write.
 
-`compose/*.json` plus `scripts/provision.mjs` replay the same model through the API if you already have an admin JWT.
+`compose/*.json` plus `scripts/bootstrap.mjs` replay the same model and seed data on `docker compose up`.
 
 ## Why these choices
 
@@ -60,7 +63,7 @@ Full write-up: [docs/Plexys-homework-documentation.pdf](docs/Plexys-homework-doc
 Real_task/
   corteza/          Docker Compose (official server + Postgres 15)
   spa/              Vue 3 desk
-  compose/          Namespace and module field specs
-  scripts/          Optional API provision
+  compose/          Namespace, module field specs, seed tickets
+  scripts/          First-boot bootstrap
   docs/             PDF + HTML source
 ```

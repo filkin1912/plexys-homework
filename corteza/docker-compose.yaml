@@ -5,7 +5,7 @@ services:
   server:
     image: cortezaproject/corteza:${VERSION}
     restart: unless-stopped
-    env_file: [.env]
+    env_file: [.env.example]
     depends_on:
       db:
         condition: service_healthy
@@ -29,6 +29,21 @@ services:
       POSTGRES_USER: corteza
       POSTGRES_PASSWORD: corteza
       POSTGRES_DB: corteza
+
+  bootstrap:
+    image: node:20-alpine
+    restart: "no"
+    depends_on:
+      server:
+        condition: service_started
+    environment:
+      CORTEZA_BASE: http://server
+      CORTEZA_PUBLIC: http://localhost:18080
+    volumes:
+      - ../scripts:/app/scripts:ro
+      - ../compose:/app/compose:ro
+    working_dir: /app
+    command: ["node", "scripts/bootstrap.mjs"]
 
 volumes:
   dbdata:

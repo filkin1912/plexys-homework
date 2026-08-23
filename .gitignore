@@ -1,6 +1,5 @@
 .DS_Store
 node_modules/
-spa/dist/
 spa/build-out/
 corteza/.env
 corteza/cookies.txt

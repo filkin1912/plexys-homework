@@ -104,11 +104,13 @@
 
   <h2>5. Admin guide</h2>
   <h3>Instance</h3>
-  <pre>cd corteza
-copy .env.example .env   # already done in this clone
+  <pre>cd spa
+npm install
+npm run build
+cd ../corteza
 docker compose up -d
 # wait until http://localhost:18080/version returns 2024.9.9</pre>
-  <p>First boot: open <code>http://localhost:18080/auth/signup</code>. The first account is an administrator. SMTP is off, so the email is treated as confirmed.</p>
+  <p>The <code>bootstrap</code> container waits for the API, then creates <code>homework@plexys.local</code> / <code>Homework!2026</code>, the Compose namespace/modules, and the seed tickets from <code>compose/seed.json</code>. It is idempotent. If an older empty volume is already on the machine, run <code>docker compose down -v</code> then <code>up -d</code> again.</p>
   <div class="box">
     <strong>Local demo account used while building:</strong><br />
     email <code>homework@plexys.local</code> · password <code>Homework!2026</code><br />

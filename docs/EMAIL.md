@@ -12,8 +12,9 @@ Local instance
 - Corteza 2024.9.9 + Postgres 15 via Docker Compose
 - Desk: http://localhost:18080/tickets
 - Compose: http://localhost:18080/compose
-- From a clean clone: `cd corteza && copy .env.example .env && docker compose up -d`, then
-  `cd ../spa && npm install && npm run build`
+- From a clean clone: `cd spa && npm install && npm run build`, then
+  `cd ../corteza && docker compose up -d`
+- Bootstrap creates the demo user and seed tickets automatically
 - First-run signup at /auth/signup (first user is admin)
 - Demo account used while building: homework@plexys.local / Homework!2026
 
