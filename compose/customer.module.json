@@ -1,0 +1,31 @@
+{
+  "name": "Customer",
+  "handle": "Customer",
+  "meta": {},
+  "fields": [
+    {
+      "name": "Name",
+      "kind": "String",
+      "label": "Name",
+      "isRequired": true,
+      "isMulti": false,
+      "options": { "multiLine": false }
+    },
+    {
+      "name": "Company",
+      "kind": "String",
+      "label": "Company",
+      "isRequired": false,
+      "isMulti": false,
+      "options": { "multiLine": false }
+    },
+    {
+      "name": "Email",
+      "kind": "Email",
+      "label": "Email",
+      "isRequired": false,
+      "isMulti": false,
+      "options": {}
+    }
+  ]
+}

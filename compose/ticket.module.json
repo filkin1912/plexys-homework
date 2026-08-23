@@ -1,0 +1,73 @@
+{
+  "name": "Support Ticket",
+  "handle": "SupportTicket",
+  "meta": {},
+  "fields": [
+    {
+      "name": "Subject",
+      "kind": "String",
+      "label": "Subject",
+      "isRequired": true,
+      "isMulti": false,
+      "options": { "multiLine": false }
+    },
+    {
+      "name": "Description",
+      "kind": "String",
+      "label": "Description",
+      "isRequired": false,
+      "isMulti": false,
+      "options": { "multiLine": true }
+    },
+    {
+      "name": "Status",
+      "kind": "Select",
+      "label": "Status",
+      "isRequired": true,
+      "isMulti": false,
+      "options": {
+        "options": [
+          { "value": "New", "text": "New" },
+          { "value": "In Progress", "text": "In Progress" },
+          { "value": "Resolved", "text": "Resolved" },
+          { "value": "Closed", "text": "Closed" }
+        ]
+      }
+    },
+    {
+      "name": "Priority",
+      "kind": "Select",
+      "label": "Priority",
+      "isRequired": true,
+      "isMulti": false,
+      "options": {
+        "options": [
+          { "value": "Low", "text": "Low" },
+          { "value": "Medium", "text": "Medium" },
+          { "value": "High", "text": "High" },
+          { "value": "Urgent", "text": "Urgent" }
+        ]
+      }
+    },
+    {
+      "name": "DueDate",
+      "kind": "DateTime",
+      "label": "Due Date",
+      "isRequired": false,
+      "isMulti": false,
+      "options": { "onlyDate": false, "onlyTime": false }
+    },
+    {
+      "name": "Customer",
+      "kind": "Record",
+      "label": "Customer",
+      "isRequired": false,
+      "isMulti": false,
+      "options": {
+        "module": "Customer",
+        "labelField": "Name",
+        "query": ["Name", "Company"]
+      }
+    }
+  ]
+}

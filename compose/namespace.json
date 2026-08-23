@@ -1,0 +1,11 @@
+{
+  "name": "plexys-homework",
+  "slug": "plexys_homework",
+  "handle": "plexys_homework",
+  "enabled": true,
+  "meta": {
+    "shortName": "Homework",
+    "subtitle": "Plexys homework namespace",
+    "description": "Support Ticket and Customer modules for the Plexys take-home."
+  }
+}

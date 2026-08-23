@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Plexys homework — Support desk</title>
+  <style>
+    @page { size: A4; margin: 18mm 16mm; }
+    body { font-family: "Segoe UI", Helvetica, Arial, sans-serif; color: #1c211c; font-size: 11pt; line-height: 1.45; }
+    h1 { font-size: 20pt; margin: 0 0 6px; }
+    h2 { font-size: 14pt; margin: 22px 0 8px; border-bottom: 1px solid #d7d1c6; padding-bottom: 4px; }
+    h3 { font-size: 12pt; margin: 16px 0 6px; }
+    p, li { margin: 0 0 8px; }
+    .kicker { letter-spacing: .14em; text-transform: uppercase; font-size: 9pt; color: #2f5c4f; }
+    .meta { color: #5f675e; font-size: 10pt; margin-bottom: 18px; }
+    table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; font-size: 10pt; }
+    th, td { border: 1px solid #d7d1c6; padding: 5px 7px; text-align: left; vertical-align: top; }
+    th { background: #f3eee4; }
+    code { font-family: Consolas, monospace; font-size: 9.5pt; }
+    pre { background: #f6f1e8; border: 1px solid #d7d1c6; padding: 8px 10px; font-size: 9pt; overflow: hidden; }
+    img { max-width: 100%; border: 1px solid #d7d1c6; margin: 8px 0 14px; }
+    .caption { font-size: 9pt; color: #5f675e; margin-top: -10px; margin-bottom: 14px; }
+    .box { border: 1px solid #d7d1c6; padding: 8px 10px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <p class="kicker">Plexys · Front-end / Full-stack homework</p>
+  <h1>Support desk on Corteza</h1>
+  <p class="meta">Vasil Filkin · Corteza 2024.9.9 · Vue 3 Composition API · local Docker</p>
+
+  <h2>1. Architecture</h2>
+  <p>One Corteza server process serves the API, the OAuth2 authorization server, the first-party webapps (Admin, Compose), and this homework SPA. PostgreSQL 15 holds Compose records and system data. The SPA is not a second origin.</p>
+  <img src="login.png" alt="Corteza login at localhost:18080/auth/login" />
+  <p class="caption">Figure 1. First-run / daily login on the local instance (Corteza 2024.9.9). The SPA at /tickets uses this same session via the default OAuth2 client.</p>
+  <pre>Browser
+  ├── /auth                  Corteza OAuth2 (login, default-client, tokens)
+  ├── /api/compose           Low Code records (Bearer access token)
+  ├── /admin                 Corteza Admin
+  ├── /compose               Corteza Low Code builder (Part 1)
+  └── /tickets               Vue 3 SPA (Part 2), listed in HTTP_WEBAPP_LIST
+         │
+         └── Postgres 15</pre>
+  <p>Requests from the desk carry the signed-in user’s access token. Corteza stamps <code>ownedBy</code>, <code>createdBy</code>, <code>createdAt</code> and <code>updatedAt</code>. The SPA never writes those fields.</p>
+
+  <h2>2. Decisions</h2>
+  <h3>Corteza 2024.9.9</h3>
+  <p>The published docs currently live under the 2024.9 series. <code>2024.9.9</code> is the latest stable tag on Docker Hub for that series. I pinned the patch (not <code>2024.9</code> floating, not <code>2024.9.10-dev.*</code>) so a clone tomorrow still boots the same bits.</p>
+
+  <h3>How the SPA is served</h3>
+  <p>Corteza can host custom webapps next to Compose: <code>HTTP_WEBAPP_ENABLED=true</code> and <code>HTTP_WEBAPP_LIST=…,tickets</code>, with the built files mounted at <code>/corteza/webapp/tickets</code> (in the 2024.9.9 image the apps live under <code>webapp/</code>, not <code>webapp/public/</code>). That is the path I used.</p>
+  <p>I did not run the SPA as a standalone Vite origin. A second origin would need a dedicated Auth Client, CORS, and a different redirect URI. First-party apps avoid that by sitting on the same host and using <code>/auth/oauth2/default-client</code>. Serving <code>/tickets</code> from Corteza keeps identity, cookies and audit trail on the platform’s terms.</p>
+  <p>I also did not build the desk as Compose pages. Compose already lists records; the brief asks for a custom SPA against the module, so Compose stays the modeller and the SPA stays the operator UI.</p>
+
+  <h3>Vue 3 instead of corteza-vue</h3>
+  <p>The brief asks for Vue 3 and the Composition API. <code>@cortezaproject/corteza-vue@2024.9.9</code> depends on Vue 2.7 and bootstrap-vue. Dropping it into Vue 3 would mean rewriting its plugin surface anyway. I used <code>@cortezaproject/corteza-js</code> <code>apiClients.Compose</code> for record calls, and a small Composition API wrapper around the same default-client flow implemented in <code>corteza-vue</code>’s auth plugin (access token in memory, refresh token in <code>sessionStorage</code>, callback at <code>/tickets/auth/callback</code>).</p>
+
+  <h3>UI toolkit</h3>
+  <p>PrimeVue supplies the modal and confirm dialog (focus trap, Escape, labelled headers). The list is a semantic HTML table with a horizontal scroll at narrow widths, not a card grid: ticket work is comparison across columns. Keyboard: native controls, dialogs, visible buttons — no hover-only actions.</p>
+
+  <h2>3. Data model (Part 1)</h2>
+  <p>Namespace <strong>Plexys Homework</strong> (<code>plexys_homework</code>). System fields were not re-created.</p>
+  <table>
+    <tr><th>Module</th><th>Field</th><th>Type</th><th>Required</th></tr>
+    <tr><td>Support Ticket</td><td>Subject</td><td>String</td><td>Yes</td></tr>
+    <tr><td>Support Ticket</td><td>Description</td><td>String, multi-line</td><td>No</td></tr>
+    <tr><td>Support Ticket</td><td>Status</td><td>Select: New, In Progress, Resolved, Closed</td><td>Yes</td></tr>
+    <tr><td>Support Ticket</td><td>Priority</td><td>Select: Low, Medium, High, Urgent</td><td>Yes</td></tr>
+    <tr><td>Support Ticket</td><td>Due Date</td><td>DateTime</td><td>No</td></tr>
+    <tr><td>Support Ticket</td><td>Customer</td><td>Record → Customer</td><td>No (bonus)</td></tr>
+    <tr><td>Customer</td><td>Name</td><td>String</td><td>Yes</td></tr>
+    <tr><td>Customer</td><td>Company</td><td>String</td><td>No</td></tr>
+    <tr><td>Customer</td><td>Email</td><td>Email</td><td>No</td></tr>
+  </table>
+  <p>Click path in Compose: Low Code → Create namespace → Module “Customer” → Module “Support Ticket” → field Customer, type Record, related module Customer, label field Name → save → add a record of each to prove the module writes.</p>
+  <p><code>compose/*.json</code> plus <code>scripts/provision.mjs</code> replay the same model through the Compose API if a reviewer prefers not to click. The UI path is the one the brief asked for.</p>
+
+  <h2>4. User guide</h2>
+  <ol>
+    <li>Open <code>http://localhost:18080/tickets</code>. Corteza’s login appears if you have no session.</li>
+    <li>Sign in as the same user you created at first-run. The desk shows <strong>Loged-in user:</strong> and that account’s email top-right. New tickets are owned by that user.</li>
+    <li><strong>Tickets</strong> lists subject, status, priority (colour-coded), related customer, due date, and Corteza’s <code>updatedAt</code>. Seven rows per page; the table height stays fixed so the pager does not jump.</li>
+    <li>Filter by subject or customer name, and/or by priority. Both filters apply together, then pagination covers the match set.</li>
+    <li><strong>New ticket</strong> opens a modal. Subject, status and priority are required. Pick a customer if one exists.</li>
+    <li><strong>Edit</strong> reopens the modal on that record. <strong>Delete</strong> asks for confirmation.</li>
+    <li><strong>Customers</strong> is the related module CRUD. The create button sits in the same top-right slot as New ticket. Create a customer before linking it on a ticket.</li>
+    <li>Sign out returns you to Corteza Auth and drops the refresh token.</li>
+  </ol>
+
+  <h2>5. Admin guide</h2>
+  <h3>Instance</h3>
+  <pre>cd corteza
+copy .env.example .env   # already done in this clone
+docker compose up -d
+# wait until http://localhost:18080/version returns 2024.9.9</pre>
+  <p>First boot: open <code>http://localhost:18080/auth/signup</code>. The first account is an administrator. SMTP is off, so the email is treated as confirmed.</p>
+  <div class="box">
+    <strong>Local demo account used while building:</strong><br />
+    email <code>homework@plexys.local</code> · password <code>Homework!2026</code><br />
+    URLs: <code>http://localhost:18080/tickets</code> · Compose <code>/compose</code> · Admin <code>/admin</code>
+  </div>
+  <h3>SPA build</h3>
+  <pre>cd spa
+npm install
+npm run build
+# docker compose already mounts spa/dist at /corteza/webapp/tickets
+# refresh http://localhost:18080/tickets</pre>
+  <h3>Auth client</h3>
+  <p>None was added. The SPA uses Corteza’s default OAuth2 client, same as Compose. Redirect URI is <code>http://localhost:18080/tickets/auth/callback</code>. Scopes: <code>profile api</code>.</p>
+  <h3>Optional API replay</h3>
+  <pre>set CORTEZA_JWT=eyJ...   # copy from an authenticated request
+node scripts/provision.mjs</pre>
+
+  <h2>6. Limitations and next</h2>
+  <ul>
+    <li>The API load caps at 200 records; the desk paginates 7 per page in the browser. Next would be Corteza page cursors.</li>
+    <li>No custom RBAC beyond “signed-in user”; next would be a Support Agent role on the namespace.</li>
+    <li>Deleting a customer does not cascade; tickets keep the old record ID until edited.</li>
+    <li>The JS bundle is large (corteza-js + PrimeVue). Next: lazy-load PrimeVue and the customers route.</li>
+    <li>No automated browser tests. Next: Playwright against the default-client callback.</li>
+    <li>If the 4–5 h budget had more room: a Service module, a status filter, and a Compose record page that deep-links into the desk.</li>
+  </ul>
+  <p>Observed, not assumed: first-run signup without SMTP marks the user confirmed; <code>/version</code> reports <code>2024.9.9</code>; the default-client exchange is POST <code>/auth/oauth2/default-client</code> with <code>application/x-www-form-urlencoded</code>; Compose record create accepts <code>values: [{name, value}]</code> and fills owner/timestamps itself. Assumed: SPA fallback for <code>/tickets/auth/callback</code> (same as other Corteza webapps); Select option JSON shape <code>{value, text}</code> matches what Compose stores.</p>
+</body>
+</html>
