@@ -25,7 +25,8 @@
 <body>
   <p class="kicker">Plexys · Front-end / Full-stack homework</p>
   <h1>Support desk on Corteza</h1>
-  <p class="meta">Vasil Filkin · Corteza 2024.9.9 · Vue 3 Composition API · local Docker</p>
+  <p class="meta">Vasil Filkin · Corteza 2024.9.9 · Vue 3 Composition API · local Docker<br />
+    Repo: <code>https://github.com/filkin1912/plexys-homework</code></p>
 
   <h2>1. Architecture</h2>
   <p>One Corteza server process serves the API, the OAuth2 authorization server, the first-party webapps (Admin, Compose), and this homework SPA. PostgreSQL 15 holds Compose records and system data. The SPA is not a second origin.</p>
@@ -54,7 +55,19 @@
   <p>The brief asks for Vue 3 and the Composition API. <code>@cortezaproject/corteza-vue@2024.9.9</code> depends on Vue 2.7 and bootstrap-vue. Dropping it into Vue 3 would mean rewriting its plugin surface anyway. I used <code>@cortezaproject/corteza-js</code> <code>apiClients.Compose</code> for record calls, and a small Composition API wrapper around the same default-client flow implemented in <code>corteza-vue</code>’s auth plugin (access token in memory, refresh token in <code>sessionStorage</code>, callback at <code>/tickets/auth/callback</code>).</p>
 
   <h3>UI toolkit</h3>
-  <p>PrimeVue supplies the modal and confirm dialog (focus trap, Escape, labelled headers). The list is a semantic HTML table with a horizontal scroll at narrow widths, not a card grid: ticket work is comparison across columns. Keyboard: native controls, dialogs, visible buttons — no hover-only actions.</p>
+  <p>PrimeVue supplies the modal and confirm dialog (focus trap, Escape, labelled headers). The list is a semantic HTML table, not a card grid: ticket work is comparison across columns. Keyboard: native controls, dialogs, visible buttons — no hover-only actions.</p>
+
+  <h3>Desk UI after the last polish</h3>
+  <p>Tickets and Customers share one four-column toolbar (count · optional filters · create button) so switching tabs does not move the table or the create button. The header is one line: <strong>Support desk</strong> plus <strong>Plexys homework</strong>, nav in the middle, and <strong>Loged-in user:</strong> with the account email on the right.</p>
+  <p>Tickets add a search that matches <em>subject or customer name</em>, a priority dropdown (All / Low / Medium / High / Urgent), and a 7-row pager. Empty rows keep the table height so Previous / 1 2 3 / Next stay put on the last page. Status and priority use the same pill size. Priority colours:</p>
+  <table>
+    <tr><th>Priority</th><th>Colour</th></tr>
+    <tr><td>Low</td><td>Green</td></tr>
+    <tr><td>Medium</td><td>Blue</td></tr>
+    <tr><td>High</td><td>Orange</td></tr>
+    <tr><td>Urgent</td><td>Red</td></tr>
+  </table>
+  <p>These filters and the pager are extra UX. The brief asked for list / create / edit / delete of Support Ticket records as the signed-in user; that path is unchanged.</p>
 
   <h2>3. Data model (Part 1)</h2>
   <p>Namespace <strong>Plexys Homework</strong> (<code>plexys_homework</code>). System fields were not re-created.</p>
@@ -95,7 +108,8 @@ docker compose up -d
   <div class="box">
     <strong>Local demo account used while building:</strong><br />
     email <code>homework@plexys.local</code> · password <code>Homework!2026</code><br />
-    URLs: <code>http://localhost:18080/tickets</code> · Compose <code>/compose</code> · Admin <code>/admin</code>
+    URLs: <code>http://localhost:18080/tickets</code> · Compose <code>/compose</code> · Admin <code>/admin</code><br />
+    GitHub: <code>https://github.com/filkin1912/plexys-homework</code>
   </div>
   <h3>SPA build</h3>
   <pre>cd spa
